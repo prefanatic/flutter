@@ -44,7 +44,19 @@ Future<void> main() async {
     });
 
     testWidgets('setSurfaceSize works', (WidgetTester tester) async {
-      await tester.pumpWidget(const MaterialApp(home: Center(child: Text('Test'))));
+      int invocations = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Center(
+            child: GestureDetector(
+              onTap: () {
+                invocations++;
+              },
+              child: const Text('Test'),
+            ),
+          ),
+        ),
+      );
 
       final Size windowCenter = tester.binding.window.physicalSize /
           tester.binding.window.devicePixelRatio /
@@ -56,17 +68,29 @@ Future<void> main() async {
       expect(widgetCenter.dx, windowCenterX);
       expect(widgetCenter.dy, windowCenterY);
 
+      await tester.tap(find.byType(Text));
+      await tester.pump();
+      expect(invocations, 1);
+
       await tester.binding.setSurfaceSize(const Size(200, 300));
       await tester.pump();
       widgetCenter = tester.getRect(find.byType(Text)).center;
       expect(widgetCenter.dx, 100);
       expect(widgetCenter.dy, 150);
 
+      await tester.tap(find.byType(Text));
+      await tester.pump();
+      expect(invocations, 2);
+
       await tester.binding.setSurfaceSize(null);
       await tester.pump();
       widgetCenter = tester.getRect(find.byType(Text)).center;
       expect(widgetCenter.dx, windowCenterX);
       expect(widgetCenter.dy, windowCenterY);
+
+      await tester.tap(find.byType(Text));
+      await tester.pump();
+      expect(invocations, 3);
     });
 
     testWidgets('Test traceAction', (WidgetTester tester) async {
