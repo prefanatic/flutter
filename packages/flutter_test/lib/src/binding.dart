@@ -1776,15 +1776,6 @@ class _LiveTestRenderView extends RenderView {
   }
 
   @override
-  bool hitTest(HitTestResult result, { required Offset position }) {
-    final Matrix4 transform = configuration.toHitTestMatrix();
-    final double det = transform.invert();
-    assert(det != 0.0);
-    position = MatrixUtils.transformPoint(transform, position);
-    return super.hitTest(result, position: position);
-  }
-
-  @override
   void paint(PaintingContext context, Offset offset) {
     assert(offset == Offset.zero);
     super.paint(context, offset);
