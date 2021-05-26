@@ -37,8 +37,8 @@ void main() {
     await gesture.removePointer();
   });
 
-  testWidgets('supports setSurfaceSize', (WidgetTester tester) async {
-  int invocations = 0;
+  testWidgets('hitTesting works when using setSurfaceSize', (WidgetTester tester) async {
+    int invocations = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
@@ -52,6 +52,26 @@ void main() {
       ),
     );
 
+    await tester.tap(find.byType(Text));
+    await tester.pump();
+    expect(invocations, 1);
+
+    await tester.binding.setSurfaceSize(const Size(200, 300));
+    await tester.pump();
+    await tester.tap(find.byType(Text));
+    await tester.pump();
+    expect(invocations, 2);
+
+    await tester.binding.setSurfaceSize(null);
+    await tester.pump();
+    await tester.tap(find.byType(Text));
+    await tester.pump();
+    expect(invocations, 3);
+  });
+
+  testWidgets('setSurfaceSize works', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Center(child: Text('Test'))));
+
     final Size windowCenter = tester.binding.window.physicalSize /
         tester.binding.window.devicePixelRatio /
         2;
@@ -62,28 +82,16 @@ void main() {
     expect(widgetCenter.dx, windowCenterX);
     expect(widgetCenter.dy, windowCenterY);
 
-    await tester.tap(find.byType(Text));
-    await tester.pump();
-    expect(invocations, 1);
-
     await tester.binding.setSurfaceSize(const Size(200, 300));
     await tester.pump();
     widgetCenter = tester.getRect(find.byType(Text)).center;
     expect(widgetCenter.dx, 100);
     expect(widgetCenter.dy, 150);
 
-    await tester.tap(find.byType(Text));
-    await tester.pump();
-    expect(invocations, 2);
-
     await tester.binding.setSurfaceSize(null);
     await tester.pump();
     widgetCenter = tester.getRect(find.byType(Text)).center;
     expect(widgetCenter.dx, windowCenterX);
     expect(widgetCenter.dy, windowCenterY);
-
-    await tester.tap(find.byType(Text));
-    await tester.pump();
-    expect(invocations, 3);
   });
 }
